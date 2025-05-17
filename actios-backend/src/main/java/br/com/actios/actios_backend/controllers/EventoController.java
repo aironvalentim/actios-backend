@@ -1,0 +1,65 @@
+package br.com.actios.actios_backend.controllers;
+
+import br.com.actios.actios_backend.model.Evento;
+import br.com.actios.actios_backend.service.EventoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/eventos")
+public class EventoController {
+
+    private final EventoService eventoService;
+
+    @Autowired
+    public EventoController(EventoService eventoService) {
+        this.eventoService = eventoService;
+    }
+
+        @PostMapping("/cadastrar")
+        public ResponseEntity<Evento> cadastrar(@RequestBody Evento evento) throws Exception {
+            Evento novo = eventoService.cadastrar(evento);
+            return ResponseEntity.ok(novo);
+        }
+
+    @GetMapping("/listar")
+    public ResponseEntity<List<Evento>> listar() {
+        List<Evento> eventos = eventoService.listarTodos();
+        return ResponseEntity.ok(eventos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Evento> buscarPorId(@PathVariable Integer id) throws Exception {
+        Evento evento = eventoService.buscarPorId(id);
+        return ResponseEntity.ok(evento);
+    }
+
+    @PutMapping("/atualizar")
+    public ResponseEntity<Evento> atualizar(@RequestBody Evento evento) throws Exception {
+        Evento atualizado = eventoService.atualizar(evento);
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @DeleteMapping("/excluir/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Integer id) throws Exception {
+        eventoService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/futuros-por-nome-palestrante")
+    public ResponseEntity<Page<Evento>> listarEventosFuturosPorNomePalestrante(
+            @RequestParam String nome,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "asc") String sort
+    ) {
+        Sort.Direction direction = sort.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "data"));
+        Page<Evento> eventos = eventoService.listarEventosFuturosPorNomePalestrante(nome, pageable);
+        return ResponseEntity.ok(eventos);
+    }
+}

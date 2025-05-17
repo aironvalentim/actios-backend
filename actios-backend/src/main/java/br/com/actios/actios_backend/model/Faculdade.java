@@ -1,6 +1,5 @@
 package br.com.actios.actios_backend.model;
 
-
 import jakarta.persistence.*;
 
 @Entity
@@ -8,7 +7,8 @@ import jakarta.persistence.*;
 public class Faculdade {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_faculdade")
     private Integer idFaculdade;
 
     @Column(name = "nome")
